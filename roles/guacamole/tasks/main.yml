@@ -1,0 +1,24 @@
+---
+- name: Install Docker CE and Compose plugin
+  import_tasks: docker.yml
+
+- name: Create directory layout
+  import_tasks: layout.yml
+
+- name: Ensure Guacamole initdb.sql is generated
+  import_tasks: initdb.yml
+
+- name: Ensure TLS certificate exists (optional self-signed)
+  import_tasks: cert.yml
+
+- name: Render Docker Compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: "{{ guac_base_dir }}/compose.yaml"
+    mode: "0644"
+
+- name: Render nginx default.conf.template
+  ansible.builtin.template:
+    src: default.conf.template.j2
+    dest: "{{ guac_base_dir }}/nginx/templates/default.conf.template"
+    mode: "0644"

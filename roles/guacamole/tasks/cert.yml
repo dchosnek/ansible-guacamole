@@ -1,0 +1,20 @@
+---
+- name: Check if certificate exists
+  ansible.builtin.stat:
+    path: "{{ guac_base_dir }}/nginx/ssl/self.cert"
+  register: cert_stat
+
+- name: Check if private key exists
+  ansible.builtin.stat:
+    path: "{{ guac_base_dir }}/nginx/ssl/self-ssl.key"
+  register: key_stat
+
+- name: Generate self-signed certificate for nginx (optional)
+  ansible.builtin.command: >
+    openssl req -x509 -nodes -newkey rsa:4096
+    -keyout "{{ guac_base_dir }}/nginx/ssl/self-ssl.key"
+    -out "{{ guac_base_dir }}/nginx/ssl/self.cert"
+    -days 365
+    -subj "{{ guac_cert_subject }}"
+  when: guac_generate_self_signed_cert and (not cert_stat.stat.exists or not key_stat.stat.exists)
+  changed_when: true

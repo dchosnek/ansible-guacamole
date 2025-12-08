@@ -1,0 +1,20 @@
+---
+- name: Create base directory for Guacamole stack
+  ansible.builtin.file:
+    path: "{{ guac_base_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create application subdirectories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ guac_base_dir }}/drive"
+    - "{{ guac_base_dir }}/record"
+    - "{{ guac_base_dir }}/data"
+    - "{{ guac_base_dir }}/guac_initdb"
+    - "{{ guac_base_dir }}/nginx"
+    - "{{ guac_base_dir }}/nginx/templates"
+    - "{{ guac_base_dir }}/nginx/ssl"

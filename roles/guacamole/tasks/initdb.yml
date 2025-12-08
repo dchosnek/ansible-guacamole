@@ -1,0 +1,15 @@
+---
+- name: Check if Guacamole initdb.sql exists
+  ansible.builtin.stat:
+    path: "{{ guac_base_dir }}/guac_initdb/initdb.sql"
+  register: initdb_stat
+
+- name: Generate Guacamole initdb.sql (PostgreSQL)
+  ansible.builtin.shell: >
+    docker run --rm {{ guac_guacamole_image }}
+    /opt/guacamole/bin/initdb.sh --postgresql
+    > "{{ guac_base_dir }}/guac_initdb/initdb.sql"
+  args:
+    executable: /bin/bash
+  when: not initdb_stat.stat.exists
+  changed_when: true

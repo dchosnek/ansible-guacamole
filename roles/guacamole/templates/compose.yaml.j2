@@ -1,0 +1,68 @@
+networks:
+  guac_backend:
+    driver: bridge
+  guac_frontend:
+    driver: bridge
+
+services:
+  # guacd: Guacamole proxy daemon (RDP/SSH/VNC/etc.)
+  guacd:
+    container_name: guacd
+    image: guacamole/guacd:1.6.0
+    restart: always
+    networks:
+      - guac_backend
+    volumes:
+      - ./drive:/drive:rw
+      - ./record:/record:rw
+
+  # PostgreSQL: only needs to talk to Guacamole (backend only)
+  postgres:
+    container_name: postgres_guacamole
+    image: postgres:16-bookworm
+    restart: always
+    environment:
+      PGDATA: /var/lib/postgresql/data/guacamole
+      POSTGRES_DB: guacamole_db
+      POSTGRES_USER: guacamole_user
+      POSTGRES_PASSWORD: "{{ guac_db_password }}"
+    networks:
+      - guac_backend
+    volumes:
+      - ./guac_initdb:/docker-entrypoint-initdb.d:ro
+      - ./data:/var/lib/postgresql/data
+
+  # Guacamole web app
+  guacamole:
+    container_name: guacamole
+    image: guacamole/guacamole:1.6.0
+    restart: always
+    depends_on:
+      - guacd
+      - postgres
+    environment:
+      GUACD_HOSTNAME: guacd
+      POSTGRESQL_HOSTNAME: postgres
+      POSTGRESQL_DATABASE: guacamole_db
+      POSTGRESQL_USERNAME: guacamole_user
+      POSTGRESQL_PASSWORD: "{{ guac_db_password }}"
+      RECORDING_SEARCH_PATH: /record
+    networks:
+      - guac_backend
+      - guac_frontend
+    volumes:
+      - ./record:/record:rw
+
+  # nginx reverse proxy (TLS terminator / frontend)
+  nginx:
+    container_name: nginx_guacamole
+    image: nginx:stable-alpine
+    restart: always
+    networks:
+      - guac_frontend
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/ssl/self.cert:/etc/nginx/ssl/self.cert:ro
+      - ./nginx/ssl/self-ssl.key:/etc/nginx/ssl/self-ssl.key:ro

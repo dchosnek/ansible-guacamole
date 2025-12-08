@@ -1,0 +1,25 @@
+---
+# Base directory for all Guacamole stack files
+guac_base_dir: /opt/guacamole-docker
+
+# Docker images
+guac_guacamole_version: "1.6.0"
+guac_guacd_image: "guacamole/guacd:1.6.0"
+guac_guacamole_image: "guacamole/guacamole:1.6.0"
+guac_postgres_image: "postgres:16-bookworm"
+guac_nginx_image: "nginx:stable-alpine"
+
+guac_db_password: "V3ryS3cur3P@ssw0rd!"
+
+# Host port where nginx exposes HTTPS
+guac_https_host_port: 8443
+
+# Generate a self-signed cert automatically if none exists
+guac_generate_self_signed_cert: true
+
+# Certificate subject (used when generating self-signed cert)
+guac_cert_subject: "/CN=guacamole.local"
+
+# Docker networks (names used in compose template)
+guac_network_backend: "guac_backend"
+guac_network_frontend: "guac_frontend"

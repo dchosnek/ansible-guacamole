@@ -1,0 +1,7 @@
+---
+- name: Provision Guacamole Docker stack
+  hosts: guacamole_hosts
+  become: true
+
+  roles:
+    - guacamole

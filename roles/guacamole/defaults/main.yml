@@ -23,3 +23,8 @@ guac_cert_subject: "/CN=guacamole.local"
 # Docker networks (names used in compose template)
 guac_network_backend: "guac_backend"
 guac_network_frontend: "guac_frontend"
+
+# Control setting up a Guacamole as a service in the OS
+guac_enable_systemd_service: true
+guac_systemd_service_name: guacamole
+guac_compose_workdir: "{{ guac_base_dir }}"

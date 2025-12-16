@@ -22,3 +22,8 @@
     src: default.conf.template.j2
     dest: "{{ guac_base_dir }}/nginx/templates/default.conf.template"
     mode: "0644"
+
+- name: Configure systemd service for Guacamole (optional)
+  import_tasks: systemd.yml
+  when: guac_enable_systemd_service | bool
+
